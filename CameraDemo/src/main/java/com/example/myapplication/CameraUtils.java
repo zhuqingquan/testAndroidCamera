@@ -6,6 +6,7 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
 
@@ -357,5 +358,80 @@ public class CameraUtils {
      */
     public static int getCameraPreviewThousandFps() {
         return mCameraPreviewFps;
+    }
+
+    /**
+     * 获取摄像头总数
+     * @return 摄像头总数
+     */
+    private static int sCameraCount = -1;
+    public static int GetCameraCount() {
+        if(sCameraCount!=-1)
+            return sCameraCount;
+
+        try {
+            Class<?> cameraClass = Class.forName("android.hardware.Camera");
+            Method getCameraCount = cameraClass.getMethod("getNumberOfCameras");
+            if (getCameraCount != null) {
+                sCameraCount = (Integer) getCameraCount.invoke(null, (Object[]) null);
+            }
+        } catch (Exception e) {
+            return -1;
+        }
+        return sCameraCount;
+    }
+
+    /**
+     * 根据Camera.Parameters判断Camera是否支持torch
+     * @param params
+     * @return
+     */
+    public static boolean supportTorch(Camera.Parameters params) {
+        boolean result = false;
+        List<String> flashModes = params.getSupportedFlashModes();
+        if (flashModes != null) {
+            int count = flashModes.size();
+            for (int i = 0; i < count; ++i) {
+                String flashMode = flashModes.get(i);
+                if (flashMode.contains("torch")) {
+                    result = true;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
+    public static int getZoom() {
+        if (mCamera == null) {
+            return 0;
+        }
+        return mCamera.getParameters().getZoom();
+    }
+
+    public static int getMaxZoom() {
+        if (mCamera == null) {
+            return 0;
+        }
+        return mCamera.getParameters().getMaxZoom();
+    }
+
+    public static boolean isZoomSupported() {
+        if (mCamera == null) {
+            return false;
+        }
+        return mCamera.getParameters().isZoomSupported();
+    }
+
+    public static void setZoom(int value) {
+        if (mCamera == null) {
+            return;
+        }
+        try {
+            Camera.Parameters params = mCamera.getParameters();
+            params.setZoom(value);
+            mCamera.setParameters(params);
+        } catch (Throwable t) {
+        }
     }
 }
