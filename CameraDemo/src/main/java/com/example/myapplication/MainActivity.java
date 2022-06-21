@@ -62,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
         int orientation = this.getResources().getConfiguration().orientation;
         mIsLanscape = orientation== Configuration.ORIENTATION_LANDSCAPE;
 
-        checkCameraHardware(this.getApplicationContext());
         createPreviewSurfaceView();
         //openCamera();
     }
@@ -102,16 +101,6 @@ public class MainActivity extends AppCompatActivity {
             Log.e("main", "摄像头被占用");
         }
         return false;
-    }
-
-
-    private boolean checkCameraHardware(Context context)
-    {
-        if(context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
-            return true;
-        } else {
-            return false;
-        }
     }
 
     private void initCamera(int width,int height){
@@ -157,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void surfaceCreated(SurfaceHolder holder) {
 
-            openCamera();
+//            openCamera();
         }
 
         @Override
@@ -189,9 +178,9 @@ public class MainActivity extends AppCompatActivity {
     SurfaceView mSurfaceView;
     private void createPreviewSurfaceView()
     {
-        mSurfaceView = findViewById(R.id.surfaceView);
-        mHolder = mSurfaceView.getHolder();
-        mHolder.addCallback(new SurfaceCallback());
+//        mSurfaceView = findViewById(R.id.surfaceView);
+//        mHolder = mSurfaceView.getHolder();
+//        mHolder.addCallback(new SurfaceCallback());
     }
 
     boolean mIsLanscape = false;
