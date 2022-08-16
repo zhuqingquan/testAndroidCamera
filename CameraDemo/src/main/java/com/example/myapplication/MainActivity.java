@@ -5,18 +5,14 @@ import androidx.core.content.ContextCompat;
 import androidx.core.app.ActivityCompat;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.os.Bundle;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
-import android.util.DisplayMetrics;
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
@@ -25,25 +21,30 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
+import android.widget.RadioButton;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
+    FrameLayout mContainer = null;
+    EGLFragment meglFragment = null;
+    CameraFragment mCamFragment = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-       FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        FrameLayout fb_container = findViewById(R.id.fl_container);
+        mContainer = fb_container;
+        meglFragment = new EGLFragment();
+        mCamFragment = new CameraFragment();
+        RadioButton rb_cam = findViewById(R.id.rb_camera);
+        rb_cam.setOnClickListener(this);
+        RadioButton rb_egl = findViewById(R.id.rb_egl);
+        rb_egl.setOnClickListener(this);
+
+        getSupportFragmentManager().beginTransaction().add(R.id.fl_container, mCamFragment, "FragmentCam").commit();
 
         int cameraCount = CameraUtils.GetCameraCount();
 
@@ -64,6 +65,29 @@ public class MainActivity extends AppCompatActivity {
 
         createPreviewSurfaceView();
         //openCamera();
+    }
+
+    @Override
+    public void onClick(View var1)
+    {
+        if(var1.getId()==R.id.rb_camera)
+        {
+            if(!mCamFragment.isAdded())
+                getSupportFragmentManager().beginTransaction().add(R.id.fl_container, mCamFragment, "FragmentCam").commit();
+            else {
+                getSupportFragmentManager().beginTransaction().hide(meglFragment).commit();
+                getSupportFragmentManager().beginTransaction().show(mCamFragment).commit();
+            }
+        }
+        else if(var1.getId()==R.id.rb_egl)
+        {
+            if(!meglFragment.isAdded())
+                getSupportFragmentManager().beginTransaction().add(R.id.fl_container, meglFragment, "FragmentEGL").commit();
+            else {
+                getSupportFragmentManager().beginTransaction().hide(mCamFragment).commit();
+                getSupportFragmentManager().beginTransaction().show(meglFragment).commit();
+            }
+        }
     }
 
     @Override
